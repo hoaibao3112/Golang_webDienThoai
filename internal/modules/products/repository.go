@@ -142,3 +142,55 @@ func (r *Repository) DeleteVariant(ctx context.Context, id primitive.ObjectID) e
 	_, err := r.db.Collection("product_variants").UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"isActive": false, "updatedAt": time.Now()}})
 	return err
 }
+
+// Brand admin methods
+func (r *Repository) CreateBrand(ctx context.Context, brand *models.Brand) error {
+	_, err := r.db.Collection("brands").InsertOne(ctx, brand)
+	return err
+}
+
+func (r *Repository) UpdateBrand(ctx context.Context, id primitive.ObjectID, update bson.M) error {
+	_, err := r.db.Collection("brands").UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": update})
+	return err
+}
+
+func (r *Repository) DeleteBrand(ctx context.Context, id primitive.ObjectID) error {
+	// Soft delete
+	_, err := r.db.Collection("brands").UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"isActive": false, "updatedAt": time.Now()}})
+	return err
+}
+
+func (r *Repository) FindBrandBySlug(ctx context.Context, slug string) (*models.Brand, error) {
+	var brand models.Brand
+	err := r.db.Collection("brands").FindOne(ctx, bson.M{"slug": slug}).Decode(&brand)
+	if err != nil {
+		return nil, err
+	}
+	return &brand, nil
+}
+
+// Category admin methods
+func (r *Repository) CreateCategory(ctx context.Context, category *models.Category) error {
+	_, err := r.db.Collection("categories").InsertOne(ctx, category)
+	return err
+}
+
+func (r *Repository) UpdateCategory(ctx context.Context, id primitive.ObjectID, update bson.M) error {
+	_, err := r.db.Collection("categories").UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": update})
+	return err
+}
+
+func (r *Repository) DeleteCategory(ctx context.Context, id primitive.ObjectID) error {
+	// Soft delete
+	_, err := r.db.Collection("categories").UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"isActive": false, "updatedAt": time.Now()}})
+	return err
+}
+
+func (r *Repository) FindCategoryBySlug(ctx context.Context, slug string) (*models.Category, error) {
+	var category models.Category
+	err := r.db.Collection("categories").FindOne(ctx, bson.M{"slug": slug}).Decode(&category)
+	if err != nil {
+		return nil, err
+	}
+	return &category, nil
+}

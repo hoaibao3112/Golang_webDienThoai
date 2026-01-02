@@ -98,3 +98,30 @@ type UpdateVariantRequest struct {
 	Stock    int     `json:"stock"`
 	IsActive bool    `json:"isActive"`
 }
+
+// Brand DTOs
+type CreateBrandRequest struct {
+	Name string `json:"name" binding:"required"`
+	Slug string `json:"slug" binding:"required"`
+	Logo string `json:"logo"`
+}
+
+type UpdateBrandRequest struct {
+	Name     string `json:"name"`
+	Logo     string `json:"logo"`
+	IsActive *bool  `json:"isActive"`
+}
+
+// Category DTOs
+type CreateCategoryRequest struct {
+	Name  string `json:"name" binding:"required"`
+	Slug  string `json:"slug" binding:"required"`
+	Image string `json:"image"`
+}
+
+type UpdateCategoryRequest struct {
+	Name     string `json:"name"`
+	Image    string `json:"image"`
+	IsActive *bool  `json:"isActive"`
+}
+

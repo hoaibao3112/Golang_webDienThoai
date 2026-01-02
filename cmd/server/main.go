@@ -14,8 +14,13 @@ import (
 	"phone-store-backend/internal/middlewares"
 	"phone-store-backend/internal/modules/auth"
 	"phone-store-backend/internal/modules/cart"
+	"phone-store-backend/internal/modules/clients"
 	"phone-store-backend/internal/modules/orders"
+	"phone-store-backend/internal/modules/payments"
 	"phone-store-backend/internal/modules/products"
+	"phone-store-backend/internal/modules/reviews"
+	"phone-store-backend/internal/modules/shipping"
+	"phone-store-backend/internal/modules/users"
 
 	"github.com/gin-gonic/gin"
 )
@@ -77,6 +82,17 @@ func main() {
 	protected := api.Group("")
 	protected.Use(middlewares.AuthMiddleware(cfg))
 	{
+		// Client profile
+		clientRepo := clients.NewRepository(mongodb.Database)
+		clientService := clients.NewService(clientRepo)
+		clientHandler := clients.NewHandler(clientService)
+
+		clientGroup := protected.Group("/clients")
+		{
+			clientGroup.GET("/profile", clientHandler.GetProfile)
+			clientGroup.PUT("/profile", clientHandler.UpdateProfile)
+		}
+
 		// Cart routes
 		cartRepo := cart.NewRepository(mongodb.Database)
 		cartService := cart.NewService(cartRepo)
@@ -100,14 +116,79 @@ func main() {
 			orderGroup.POST("", orderHandler.CreateOrder)
 			orderGroup.GET("/me", orderHandler.GetMyOrders)
 			orderGroup.GET("/:id", orderHandler.GetOrderByID)
+			orderGroup.GET("/:id/history", orderHandler.GetOrderHistory)
+		}
+
+		// Review routes
+		reviewRepo := reviews.NewRepository(mongodb.Database)
+		reviewService := reviews.NewService(reviewRepo, mongodb.Database)
+		reviewHandler := reviews.NewHandler(reviewService)
+
+		protected.POST("/reviews", reviewHandler.CreateReview)
+
+		// Shipping addresses
+		shippingRepo := shipping.NewRepository(mongodb.Database)
+		shippingService := shipping.NewService(shippingRepo)
+		shippingHandler := shipping.NewHandler(shippingService)
+
+		shippingGroup := protected.Group("/shipping-addresses")
+		{
+			shippingGroup.GET("", shippingHandler.GetAddresses)
+			shippingGroup.POST("", shippingHandler.CreateAddress)
+			shippingGroup.PUT("/:id", shippingHandler.UpdateAddress)
 		}
 	}
+
+	// Public routes (no auth required)
+	api.GET("/products/:id/reviews", func(c *gin.Context) {
+		reviewRepo := reviews.NewRepository(mongodb.Database)
+		reviewService := reviews.NewService(reviewRepo, mongodb.Database)
+		reviewHandler := reviews.NewHandler(reviewService)
+		reviewHandler.GetProductReviews(c)
+	})
+
+	// Payment methods (public)
+	paymentRepo := payments.NewRepository(mongodb.Database)
+	paymentService := payments.NewService(paymentRepo)
+	paymentHandler := payments.NewHandler(paymentService)
+
+	api.GET("/payment-methods", paymentHandler.GetPaymentMethods)
+	api.GET("/shipping-methods", func(c *gin.Context) {
+		shippingRepo := shipping.NewRepository(mongodb.Database)
+		shippingService := shipping.NewService(shippingRepo)
+		shippingHandler := shipping.NewHandler(shippingService)
+		shippingHandler.GetShippingMethods(c)
+	})
+
+	protected.POST("/payments", paymentHandler.CreatePayment)
+	protected.GET("/payments/:orderId", paymentHandler.GetPaymentByOrderID)
 
 	// Admin routes (require authentication + admin role)
 	admin := api.Group("/admin")
 	admin.Use(middlewares.AuthMiddleware(cfg))
-	admin.Use(middlewares.RequireAdmin())
+	admin.Use(middlewares.AdminOnly())
 	{
+		// User management (staff/admin)
+		userRepo := users.NewRepository(mongodb.Database)
+		userService := users.NewService(userRepo)
+		userHandler := users.NewHandler(userService)
+
+		adminUsers := admin.Group("/users")
+		{
+			adminUsers.GET("", userHandler.GetUsers)
+			adminUsers.GET("/:id", userHandler.GetUserByID)
+			adminUsers.POST("", userHandler.CreateUser)
+			adminUsers.PUT("/:id", userHandler.UpdateUser)
+			adminUsers.DELETE("/:id", userHandler.DeleteUser)
+		}
+
+		// Client management
+		clientRepo := clients.NewRepository(mongodb.Database)
+		clientService := clients.NewService(clientRepo)
+		clientHandler := clients.NewHandler(clientService)
+
+		admin.GET("/clients", clientHandler.GetAllClients)
+
 		// Product management
 		adminProducts := admin.Group("/products")
 		{
@@ -123,6 +204,44 @@ func main() {
 			adminVariants.PUT("/:id", productHandler.UpdateVariant)
 			adminVariants.DELETE("/:id", productHandler.DeleteVariant)
 		}
+
+		// Brand management
+		adminBrands := admin.Group("/brands")
+		{
+			adminBrands.POST("", productHandler.CreateBrand)
+			adminBrands.PUT("/:id", productHandler.UpdateBrand)
+			adminBrands.DELETE("/:id", productHandler.DeleteBrand)
+		}
+
+		// Category management
+		adminCategories := admin.Group("/categories")
+		{
+			adminCategories.POST("", productHandler.CreateCategory)
+			adminCategories.PUT("/:id", productHandler.UpdateCategory)
+			adminCategories.DELETE("/:id", productHandler.DeleteCategory)
+		}
+
+		// Review management
+		reviewRepo := reviews.NewRepository(mongodb.Database)
+		reviewService := reviews.NewService(reviewRepo, mongodb.Database)
+		reviewHandler := reviews.NewHandler(reviewService)
+
+		admin.DELETE("/reviews/:id", reviewHandler.DeleteReview)
+
+		// Order management
+		orderRepo := orders.NewRepository(mongodb.Database)
+		orderService := orders.NewService(orderRepo)
+		orderHandler := orders.NewHandler(orderService)
+
+		admin.GET("/orders", orderHandler.GetAllOrders)
+		admin.PUT("/orders/:id/status", orderHandler.UpdateOrderStatus)
+
+		// Shipment management
+		shippingRepo := shipping.NewRepository(mongodb.Database)
+		shippingService := shipping.NewService(shippingRepo)
+		shippingHandler := shipping.NewHandler(shippingService)
+
+		admin.POST("/shipments", shippingHandler.CreateShipment)
 	}
 
 	// Start server with graceful shutdown

@@ -9,6 +9,7 @@ import (
 	"phone-store-backend/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Service struct {
@@ -226,3 +227,121 @@ func (s *Service) transformOrder(order *models.Order, items []*models.OrderItem)
 		CreatedAt:       order.CreatedAt.Format(time.RFC3339),
 	}
 }
+
+// UpdateOrderStatus updates order status and logs history
+func (s *Service) UpdateOrderStatus(ctx context.Context, orderID, status, note, updatedBy string) error {
+	oid, err := primitive.ObjectIDFromHex(orderID)
+	if err != nil {
+		return errors.New("invalid order ID")
+	}
+
+	userID, err := primitive.ObjectIDFromHex(updatedBy)
+	if err != nil {
+		return errors.New("invalid user ID")
+	}
+
+	// Validate status
+	validStatuses := []string{"PENDING", "CONFIRMED", "PROCESSING", "SHIPPING", "DELIVERED", "CANCELLED"}
+	isValid := false
+	for _, s := range validStatuses {
+		if s == status {
+			isValid = true
+			break
+		}
+	}
+	if !isValid {
+		return errors.New("invalid order status")
+	}
+
+	// Update order status
+	if err := s.repo.UpdateOrderStatus(ctx, oid, status); err != nil {
+		return err
+	}
+
+	// Log status history
+	history := &models.OrderStatusHistory{
+		ID:        primitive.NewObjectID(),
+		OrderID:   oid,
+		Status:    status,
+		Note:      note,
+		UpdatedBy: userID,
+		CreatedAt: time.Now(),
+	}
+
+	return s.repo.CreateStatusHistory(ctx, history)
+}
+
+// GetOrderStatusHistory retrieves order status history
+func (s *Service) GetOrderStatusHistory(ctx context.Context, orderID string) ([]StatusHistoryResponse, error) {
+	oid, err := primitive.ObjectIDFromHex(orderID)
+	if err != nil {
+		return nil, errors.New("invalid order ID")
+	}
+
+	history, err := s.repo.FindStatusHistoryByOrderID(ctx, oid)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []StatusHistoryResponse
+	for _, h := range history {
+		response = append(response, StatusHistoryResponse{
+			Status:    h.Status,
+			Note:      h.Note,
+			UpdatedBy: h.UpdatedBy.Hex(),
+			CreatedAt: h.CreatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return response, nil
+}
+
+// GetAllOrders returns all orders (admin only) with pagination
+func (s *Service) GetAllOrders(ctx context.Context, page, limit int, status string) (*OrdersListResponse, error) {
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 20
+	}
+
+	filter := primitive.M{}
+	if status != "" {
+		filter["status"] = status
+	}
+
+	opts := options.Find()
+	opts.SetSkip(int64((page - 1) * limit))
+	opts.SetLimit(int64(limit))
+	opts.SetSort(primitive.D{{Key: "createdAt", Value: -1}})
+
+	orders, err := s.repo.FindAllOrders(ctx, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	total, err := s.repo.CountOrders(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var orderResponses []*OrderResponse
+	for _, order := range orders {
+		items, err := s.repo.FindOrderItemsByOrderID(ctx, order.ID)
+		if err != nil {
+			continue
+		}
+		orderResponses = append(orderResponses, s.transformOrder(order, items))
+	}
+
+	totalPages := int((total + int64(limit) - 1) / int64(limit))
+
+	return &OrdersListResponse{
+		Data:       orderResponses,
+		Page:       page,
+		Limit:      limit,
+		Total:      total,
+		TotalPages: totalPages,
+	}, nil
+}
+

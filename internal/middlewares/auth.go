@@ -80,3 +80,65 @@ func RequireAdmin() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// AdminOnly middleware - only ADMIN can access
+func AdminOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+		if !exists || role != "ADMIN" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Admin access required",
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+// StaffOrAdmin middleware - STAFF or ADMIN can access
+func StaffOrAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+		if !exists {
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Authentication required",
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+
+		if role != "ADMIN" && role != "STAFF" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Staff or Admin access required",
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+// ClientOnly middleware - only CLIENT can access
+func ClientOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+		if !exists || role != "CLIENT" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Client access required",
+				"data":    nil,
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+

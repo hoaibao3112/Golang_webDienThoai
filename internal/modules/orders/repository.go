@@ -119,3 +119,58 @@ func (r *Repository) FindOrderItemsByOrderID(ctx context.Context, orderID primit
 	}
 	return items, nil
 }
+
+// Order Status History methods
+func (r *Repository) CreateStatusHistory(ctx context.Context, history *models.OrderStatusHistory) error {
+	_, err := r.db.Collection("order_status_history").InsertOne(ctx, history)
+	return err
+}
+
+func (r *Repository) FindStatusHistoryByOrderID(ctx context.Context, orderID primitive.ObjectID) ([]*models.OrderStatusHistory, error) {
+	opts := options.Find().SetSort(bson.D{{Key: "createdAt", Value: 1}})
+	cursor, err := r.db.Collection("order_status_history").Find(ctx, bson.M{"orderId": orderID}, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var history []*models.OrderStatusHistory
+	if err := cursor.All(ctx, &history); err != nil {
+		return nil, err
+	}
+	return history, nil
+}
+
+func (r *Repository) UpdateOrderStatus(ctx context.Context, id primitive.ObjectID, status string) error {
+	_, err := r.db.Collection("orders").UpdateOne(
+		ctx,
+		bson.M{"_id": id},
+		bson.M{
+			"$set": bson.M{
+				"status":    status,
+				"updatedAt": time.Now(),
+			},
+		},
+	)
+	return err
+}
+
+// Admin methods
+func (r *Repository) FindAllOrders(ctx context.Context, filter bson.M, opts *options.FindOptions) ([]*models.Order, error) {
+	cursor, err := r.db.Collection("orders").Find(ctx, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var orders []*models.Order
+	if err := cursor.All(ctx, &orders); err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
+
+func (r *Repository) CountOrders(ctx context.Context, filter bson.M) (int64, error) {
+	return r.db.Collection("orders").CountDocuments(ctx, filter)
+}
+

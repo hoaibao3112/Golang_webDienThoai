@@ -358,3 +358,104 @@ func (s *Service) calculatePriceRange(variants []*models.ProductVariant) (float6
 
 	return minPrice, maxPrice
 }
+
+// Brand admin methods
+func (s *Service) CreateBrand(ctx context.Context, req *CreateBrandRequest) error {
+	// Check if slug already exists
+	existing, _ := s.repo.FindBrandBySlug(ctx, req.Slug)
+	if existing != nil {
+		return errors.New("brand slug already exists")
+	}
+
+	brand := &models.Brand{
+		ID:        primitive.NewObjectID(),
+		Name:      req.Name,
+		Slug:      req.Slug,
+		Logo:      req.Logo,
+		IsActive:  true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	return s.repo.CreateBrand(ctx, brand)
+}
+
+func (s *Service) UpdateBrand(ctx context.Context, id string, req *UpdateBrandRequest) error {
+	brandID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("invalid brand ID")
+	}
+
+	update := bson.M{"updatedAt": time.Now()}
+
+	if req.Name != "" {
+		update["name"] = req.Name
+	}
+	if req.Logo != "" {
+		update["logo"] = req.Logo
+	}
+	if req.IsActive != nil {
+		update["isActive"] = *req.IsActive
+	}
+
+	return s.repo.UpdateBrand(ctx, brandID, update)
+}
+
+func (s *Service) DeleteBrand(ctx context.Context, id string) error {
+	brandID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("invalid brand ID")
+	}
+	return s.repo.DeleteBrand(ctx, brandID)
+}
+
+// Category admin methods
+func (s *Service) CreateCategory(ctx context.Context, req *CreateCategoryRequest) error {
+	// Check if slug already exists
+	existing, _ := s.repo.FindCategoryBySlug(ctx, req.Slug)
+	if existing != nil {
+		return errors.New("category slug already exists")
+	}
+
+	category := &models.Category{
+		ID:        primitive.NewObjectID(),
+		Name:      req.Name,
+		Slug:      req.Slug,
+		Image:     req.Image,
+		IsActive:  true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	return s.repo.CreateCategory(ctx, category)
+}
+
+func (s *Service) UpdateCategory(ctx context.Context, id string, req *UpdateCategoryRequest) error {
+	categoryID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("invalid category ID")
+	}
+
+	update := bson.M{"updatedAt": time.Now()}
+
+	if req.Name != "" {
+		update["name"] = req.Name
+	}
+	if req.Image != "" {
+		update["image"] = req.Image
+	}
+	if req.IsActive != nil {
+		update["isActive"] = *req.IsActive
+	}
+
+	return s.repo.UpdateCategory(ctx, categoryID, update)
+}
+
+func (s *Service) DeleteCategory(ctx context.Context, id string) error {
+	categoryID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("invalid category ID")
+	}
+	return s.repo.DeleteCategory(ctx, categoryID)
+}
+

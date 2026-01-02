@@ -221,3 +221,156 @@ func (h *Handler) DeleteVariant(c *gin.Context) {
 		"message": "Variant deleted successfully",
 	})
 }
+
+// Brand admin handlers
+func (h *Handler) CreateBrand(c *gin.Context) {
+	var req CreateBrandRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request data",
+			"data":    err.Error(),
+		})
+		return
+	}
+
+	if err := h.service.CreateBrand(c.Request.Context(), &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Brand created successfully",
+		"data":    nil,
+	})
+}
+
+func (h *Handler) UpdateBrand(c *gin.Context) {
+	id := c.Param("id")
+
+	var req UpdateBrandRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request data",
+			"data":    err.Error(),
+		})
+		return
+	}
+
+	if err := h.service.UpdateBrand(c.Request.Context(), id, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Brand updated successfully",
+		"data":    nil,
+	})
+}
+
+func (h *Handler) DeleteBrand(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := h.service.DeleteBrand(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Brand deleted successfully",
+		"data":    nil,
+	})
+}
+
+// Category admin handlers
+func (h *Handler) CreateCategory(c *gin.Context) {
+	var req CreateCategoryRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request data",
+			"data":    err.Error(),
+		})
+		return
+	}
+
+	if err := h.service.CreateCategory(c.Request.Context(), &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Category created successfully",
+		"data":    nil,
+	})
+}
+
+func (h *Handler) UpdateCategory(c *gin.Context) {
+	id := c.Param("id")
+
+	var req UpdateCategoryRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Invalid request data",
+			"data":    err.Error(),
+		})
+		return
+	}
+
+	if err := h.service.UpdateCategory(c.Request.Context(), id, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Category updated successfully",
+		"data":    nil,
+	})
+}
+
+func (h *Handler) DeleteCategory(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := h.service.DeleteCategory(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+			"data":    nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Category deleted successfully",
+		"data":    nil,
+	})
+}
+

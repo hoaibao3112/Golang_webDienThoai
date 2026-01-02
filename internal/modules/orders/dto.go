@@ -39,3 +39,27 @@ type OrderItemResponse struct {
 	Quantity    int     `json:"quantity"`
 	TotalPrice  float64 `json:"totalPrice"`
 }
+
+// UpdateOrderStatusRequest DTO for updating order status
+type UpdateOrderStatusRequest struct {
+	Status string `json:"status" binding:"required"`
+	Note   string `json:"note"`
+}
+
+// StatusHistoryResponse DTO for order status history
+type StatusHistoryResponse struct {
+	Status    string `json:"status"`
+	Note      string `json:"note"`
+	UpdatedBy string `json:"updatedBy"`
+	CreatedAt string `json:"createdAt"`
+}
+
+// OrdersListResponse DTO for paginated orders list
+type OrdersListResponse struct {
+	Data       []*OrderResponse `json:"data"`
+	Page       int              `json:"page"`
+	Limit      int              `json:"limit"`
+	Total      int64            `json:"total"`
+	TotalPages int              `json:"totalPages"`
+}
+
