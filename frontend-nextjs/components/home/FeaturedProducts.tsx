@@ -59,7 +59,7 @@ export default function FeaturedProducts() {
 
     setAddingToCart(product.id)
     try {
-      await cartService.addItem(availableVariant.id, 1)
+      await cartService.addItem({ variantId: availableVariant.id, quantity: 1 })
       toast.success('Đã thêm vào giỏ hàng')
     } catch (error: any) {
       if (error.message?.includes('đăng nhập')) {

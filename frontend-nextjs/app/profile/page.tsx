@@ -43,7 +43,7 @@ export default function ProfilePage() {
     }
     
     if (user) {
-      setName(user.full_name || user.username || '')
+      setName(user.fullName || '')
       setEmail(user.email || '')
       setPhone(user.phone || '')
     }
@@ -57,7 +57,7 @@ export default function ProfilePage() {
 
   const handleCancel = () => {
     if (user) {
-      setName(user.full_name || user.username || '')
+      setName(user.fullName || '')
       setEmail(user.email || '')
       setPhone(user.phone || '')
     }
@@ -83,7 +83,7 @@ export default function ProfilePage() {
   }
 
   const handleActivate2FA = () => {
-    toast.info('Tính năng xác thực hai yếu tố sẽ sớm được cập nhật')
+    toast('Tính năng xác thực hai yếu tố sẽ sớm được cập nhật', { icon: 'ℹ️' })
   }
 
   if (!isAuthenticated || !user) {
@@ -103,10 +103,10 @@ export default function ProfilePage() {
             <div className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  {(user.full_name || user.username || 'U').charAt(0).toUpperCase()}
+                  {(user.fullName || user.email || 'U').charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="font-semibold">{user.full_name || user.username}</p>
+                  <p className="font-semibold">{user.fullName}</p>
                   <p className="text-sm text-gray-500">{user.email}</p>
                 </div>
               </div>
@@ -144,7 +144,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
                   <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-4xl">
-                    {(user.full_name || user.username || 'U').charAt(0).toUpperCase()}
+                    {(user.fullName || user.email || 'U').charAt(0).toUpperCase()}
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">Ảnh đại diện</h3>

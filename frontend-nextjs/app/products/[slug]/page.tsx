@@ -83,13 +83,13 @@ export default function ProductDetailPage() {
 
   const getUniqueStorages = () => {
     if (!product?.variants) return []
-    const storages = [...new Set(product.variants.map(v => v.storage))]
+    const storages = Array.from(new Set(product.variants.map(v => v.storage)))
     return storages
   }
 
   const getUniqueColors = () => {
     if (!product?.variants) return []
-    const colors = [...new Set(product.variants.map(v => v.color))]
+    const colors = Array.from(new Set(product.variants.map(v => v.color)))
     return colors
   }
 

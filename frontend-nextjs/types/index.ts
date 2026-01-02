@@ -41,6 +41,7 @@ export interface Product {
   isNew?: boolean
   isActive: boolean
   isFeatured: boolean
+  variants?: ProductVariant[]
 }
 
 export interface ProductVariant {
@@ -94,18 +95,41 @@ export interface OrderItem {
   price: number
   quantity: number
   totalPrice: number
+  image?: string
+  productName?: string
+  variantName?: string
+}
+
+export interface StatusHistory {
+  status: string
+  note: string
+  createdAt: string
+  created_at?: string
 }
 
 export interface Order {
   id: string
   orderNumber: string
+  order_number?: string
+  userId?: string
+  user_id?: string
   shippingAddress: ShippingAddress
+  shipping_address?: ShippingAddress
   items: OrderItem[]
   subTotal: number
   discount: number
   total: number
-  status: 'PENDING' | 'PAID' | 'SHIPPING' | 'COMPLETED' | 'CANCELED'
+  totalAmount?: number
+  total_amount?: number
+  status: 'PENDING' | 'PAID' | 'SHIPPING' | 'COMPLETED' | 'CANCELED' | 'pending' | 'confirmed' | 'processing' | 'shipping' | 'delivered' | 'cancelled'
+  paymentStatus?: string
+  payment_status?: string
+  paymentMethod?: string
+  payment_method?: string
+  statusHistory?: StatusHistory[]
+  status_history?: StatusHistory[]
   createdAt: string
+  created_at?: string
 }
 
 export interface PaginatedResponse<T> {

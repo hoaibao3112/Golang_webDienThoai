@@ -5,19 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { cartService } from '@/services/cartService'
+import { CartItem } from '@/types'
 import toast from 'react-hot-toast'
-
-interface CartItem {
-  variantId: string
-  productName: string
-  variant: string
-  color: string
-  storage: string
-  price: number
-  quantity: number
-  image: string
-  originalPrice?: number
-}
 
 export default function CartPage() {
   const router = useRouter()
@@ -149,11 +138,6 @@ export default function CartPage() {
                       <span className="text-blue-600 font-bold text-lg">
                         {formatPrice(item.price)}
                       </span>
-                      {item.originalPrice && item.originalPrice > item.price && (
-                        <span className="text-gray-400 line-through text-sm">
-                          {formatPrice(item.originalPrice)}
-                        </span>
-                      )}
                     </div>
                   </div>
 
