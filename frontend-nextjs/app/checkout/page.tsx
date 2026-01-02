@@ -49,10 +49,17 @@ export default function CheckoutPage() {
       }))
       setItems(mappedItems)
       if (mappedItems.length === 0) {
+        toast.error('Giỏ hàng trống')
         router.push('/cart')
       }
-    } catch (error) {
-      toast.error('Không thể tải giỏ hàng')
+    } catch (error: any) {
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        toast.error('Vui lòng đăng nhập để thanh toán')
+        setTimeout(() => router.push('/auth/login'), 1500)
+      } else {
+        toast.error('Không thể tải giỏ hàng')
+        router.push('/cart')
+      }
     }
   }
 

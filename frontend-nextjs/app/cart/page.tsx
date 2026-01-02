@@ -34,8 +34,14 @@ export default function CartPage() {
     try {
       const data = await cartService.getCart()
       setItems(data.items || [])
-    } catch (error) {
-      toast.error('Không thể tải giỏ hàng')
+    } catch (error: any) {
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        toast.error('Vui lòng đăng nhập để xem giỏ hàng')
+        setTimeout(() => router.push('/auth/login'), 1500)
+      } else {
+        toast.error('Không thể tải giỏ hàng')
+      }
+      setItems([])
     } finally {
       setLoading(false)
     }
@@ -44,7 +50,7 @@ export default function CartPage() {
   const updateQuantity = async (variantId: string, quantity: number) => {
     if (quantity < 1) return
     try {
-      await cartService.updateItem(variantId, quantity)
+      await cartService.updateItem(variantId, { quantity })
       await fetchCart()
       toast.success('Đã cập nhật số lượng')
     } catch (error) {

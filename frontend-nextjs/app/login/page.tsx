@@ -4,10 +4,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/services/authService'
+import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { setAuth } = useAuthStore()
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
 
@@ -27,7 +29,8 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      await authService.login({ email: loginEmail, password: loginPassword })
+      const response = await authService.login({ email: loginEmail, password: loginPassword })
+      setAuth(response.user, response.token)
       toast.success('Đăng nhập thành công!')
       router.push('/')
     } catch (error: any) {
