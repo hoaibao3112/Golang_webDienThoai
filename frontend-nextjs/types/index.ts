@@ -36,6 +36,9 @@ export interface Product {
   images: string[]
   minPrice: number
   maxPrice: number
+  originalPrice?: number
+  discount?: number
+  isNew?: boolean
   isActive: boolean
   isFeatured: boolean
 }

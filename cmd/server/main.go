@@ -45,6 +45,9 @@ func main() {
 	router.Use(middlewares.CORSMiddleware(cfg.CORSOrigin))
 	router.Use(middlewares.ErrorHandler())
 
+	// Serve static files (images)
+	router.Static("/images", "./public/images")
+
 	// Health check
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -140,7 +143,7 @@ func main() {
 	}
 
 	// Public routes (no auth required)
-	api.GET("/products/:id/reviews", func(c *gin.Context) {
+	api.GET("/products/:slug/reviews", func(c *gin.Context) {
 		reviewRepo := reviews.NewRepository(mongodb.Database)
 		reviewService := reviews.NewService(reviewRepo, mongodb.Database)
 		reviewHandler := reviews.NewHandler(reviewService)

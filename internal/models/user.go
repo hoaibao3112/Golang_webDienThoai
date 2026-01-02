@@ -12,6 +12,7 @@ type User struct {
 	Password  string             `bson:"password" json:"-"`
 	FullName  string             `bson:"fullName" json:"fullName"`
 	Phone     string             `bson:"phone" json:"phone"`
+	Role      string             `bson:"role" json:"role"`
 	RoleID    primitive.ObjectID `bson:"roleId" json:"roleId"`
 	IsActive  bool               `bson:"isActive" json:"isActive"`
 	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`

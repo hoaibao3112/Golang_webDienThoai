@@ -34,7 +34,7 @@ export default function CategoryList() {
             className="relative h-32 md:h-48 rounded-lg overflow-hidden group"
           >
             <Image
-              src={category.image || '/placeholder.png'}
+              src={category.image ? (category.image.startsWith('http') ? category.image : `/${category.image.replace(/^\//, '')}`) : '/placeholder.png'}
               alt={category.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform"

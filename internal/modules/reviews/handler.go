@@ -17,11 +17,11 @@ func NewHandler(service *Service) *Handler {
 // GetProductReviews godoc
 // @Summary Get reviews for a product
 // @Tags Reviews
-// @Param id path string true "Product ID"
+// @Param slug path string true "Product Slug"
 // @Success 200 {array} ReviewResponse
-// @Router /api/products/{id}/reviews [get]
+// @Router /api/products/{slug}/reviews [get]
 func (h *Handler) GetProductReviews(c *gin.Context) {
-	productID := c.Param("id")
+	productID := c.Param("slug")
 
 	reviews, err := h.service.GetProductReviews(c.Request.Context(), productID)
 	if err != nil {

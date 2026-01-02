@@ -16,7 +16,7 @@ const (
 	OrderStatusCanceled  OrderStatus = "CANCELED"
 )
 
-type ShippingAddress struct {
+type OrderShippingAddress struct {
 	FullName string `bson:"fullName" json:"fullName"`
 	Phone    string `bson:"phone" json:"phone"`
 	Address  string `bson:"address" json:"address"`
@@ -26,15 +26,15 @@ type ShippingAddress struct {
 }
 
 type Order struct {
-	ID              primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	OrderNumber     string             `bson:"orderNumber" json:"orderNumber"`
-	UserID          primitive.ObjectID `bson:"userId" json:"userId"`
-	ShippingAddress ShippingAddress    `bson:"shippingAddress" json:"shippingAddress"`
-	VoucherCode     string             `bson:"voucherCode,omitempty" json:"voucherCode,omitempty"`
-	SubTotal        float64            `bson:"subTotal" json:"subTotal"`
-	Discount        float64            `bson:"discount" json:"discount"`
-	Total           float64            `bson:"total" json:"total"`
-	Status          OrderStatus        `bson:"status" json:"status"`
-	CreatedAt       time.Time          `bson:"createdAt" json:"createdAt"`
-	UpdatedAt       time.Time          `bson:"updatedAt" json:"updatedAt"`
+	ID              primitive.ObjectID   `bson:"_id,omitempty" json:"id"`
+	OrderNumber     string               `bson:"orderNumber" json:"orderNumber"`
+	UserID          primitive.ObjectID   `bson:"userId" json:"userId"`
+	ShippingAddress OrderShippingAddress `bson:"shippingAddress" json:"shippingAddress"`
+	VoucherCode     string               `bson:"voucherCode,omitempty" json:"voucherCode,omitempty"`
+	SubTotal        float64              `bson:"subTotal" json:"subTotal"`
+	Discount        float64              `bson:"discount" json:"discount"`
+	Total           float64              `bson:"total" json:"total"`
+	Status          OrderStatus          `bson:"status" json:"status"`
+	CreatedAt       time.Time            `bson:"createdAt" json:"createdAt"`
+	UpdatedAt       time.Time            `bson:"updatedAt" json:"updatedAt"`
 }

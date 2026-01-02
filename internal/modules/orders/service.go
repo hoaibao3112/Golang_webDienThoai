@@ -97,7 +97,7 @@ func (s *Service) CreateOrder(ctx context.Context, userID string, req *CreateOrd
 		ID:          primitive.NewObjectID(),
 		OrderNumber: s.generateOrderNumber(),
 		UserID:      uid,
-		ShippingAddress: models.ShippingAddress{
+		ShippingAddress: models.OrderShippingAddress{
 			FullName: req.ShippingAddress.FullName,
 			Phone:    req.ShippingAddress.Phone,
 			Address:  req.ShippingAddress.Address,
@@ -344,4 +344,3 @@ func (s *Service) GetAllOrders(ctx context.Context, page, limit int, status stri
 		TotalPages: totalPages,
 	}, nil
 }
-

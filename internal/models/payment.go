@@ -21,6 +21,7 @@ type Payment struct {
 	Amount        float64            `bson:"amount" json:"amount"`
 	Status        PaymentStatus      `bson:"status" json:"status"`
 	TransactionID string             `bson:"transactionId,omitempty" json:"transactionId,omitempty"`
+	PaidAt        *time.Time         `bson:"paidAt,omitempty" json:"paidAt,omitempty"`
 	CreatedAt     time.Time          `bson:"createdAt" json:"createdAt"`
 	UpdatedAt     time.Time          `bson:"updatedAt" json:"updatedAt"`
 }

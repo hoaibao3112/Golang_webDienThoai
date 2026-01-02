@@ -59,7 +59,7 @@ export default function FeaturedProducts() {
           >
             <div className="relative aspect-square mb-3">
               <Image
-                src={product.images[0] || '/placeholder.png'}
+                src={(product.images[0] && product.images[0].startsWith('http')) ? product.images[0] : (product.images[0] ? `/${product.images[0].replace(/^\//, '')}` : '/placeholder.png')}
                 alt={product.name}
                 fill
                 className="object-cover rounded-lg"

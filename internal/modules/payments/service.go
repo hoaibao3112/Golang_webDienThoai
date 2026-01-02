@@ -46,20 +46,13 @@ func (s *Service) CreatePayment(ctx context.Context, req *CreatePaymentRequest) 
 		return errors.New("invalid order ID")
 	}
 
-	// Get payment method
-	paymentMethod, err := s.repo.FindPaymentMethodByCode(ctx, req.PaymentMethodCode)
-	if err != nil {
-		return errors.New("payment method not found")
-	}
-
 	// Create payment
 	payment := &models.Payment{
-		OrderID:         orderID,
-		PaymentMethodID: paymentMethod.ID,
-		Amount:          req.Amount,
-		Status:          "PENDING", // PENDING, COMPLETED, FAILED
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		OrderID:   orderID,
+		Amount:    req.Amount,
+		Status:    models.PaymentStatusPending,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	// If COD, payment is pending until delivered
@@ -91,7 +84,7 @@ func (s *Service) GetPaymentByOrderID(ctx context.Context, orderID string) (*Pay
 		OrderID:       payment.OrderID.Hex(),
 		PaymentMethod: paymentMethodName,
 		Amount:        payment.Amount,
-		Status:        payment.Status,
+		Status:        string(payment.Status),
 		CreatedAt:     payment.CreatedAt,
 	}
 

@@ -36,7 +36,7 @@ export default function BrandList() {
           >
             {brand.logo ? (
               <Image
-                src={brand.logo}
+                src={brand.logo.startsWith('http') ? brand.logo : `/${brand.logo.replace(/^\//, '')}`}
                 alt={brand.name}
                 width={80}
                 height={80}

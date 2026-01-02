@@ -17,27 +17,27 @@ type ShippingAddressRequest struct {
 }
 
 type OrderResponse struct {
-	ID              string                `json:"id"`
-	OrderNumber     string                `json:"orderNumber"`
-	ShippingAddress models.ShippingAddress `json:"shippingAddress"`
-	Items           []OrderItemResponse   `json:"items"`
-	SubTotal        float64               `json:"subTotal"`
-	Discount        float64               `json:"discount"`
-	Total           float64               `json:"total"`
-	Status          string                `json:"status"`
-	CreatedAt       string                `json:"createdAt"`
+	ID              string                      `json:"id"`
+	OrderNumber     string                      `json:"orderNumber"`
+	ShippingAddress models.OrderShippingAddress `json:"shippingAddress"`
+	Items           []OrderItemResponse         `json:"items"`
+	SubTotal        float64                     `json:"subTotal"`
+	Discount        float64                     `json:"discount"`
+	Total           float64                     `json:"total"`
+	Status          string                      `json:"status"`
+	CreatedAt       string                      `json:"createdAt"`
 }
 
 type OrderItemResponse struct {
-	ProductID   string  `json:"productId"`
-	VariantID   string  `json:"variantId"`
-	Name        string  `json:"name"`
-	SKU         string  `json:"sku"`
-	Color       string  `json:"color"`
-	Storage     string  `json:"storage"`
-	Price       float64 `json:"price"`
-	Quantity    int     `json:"quantity"`
-	TotalPrice  float64 `json:"totalPrice"`
+	ProductID  string  `json:"productId"`
+	VariantID  string  `json:"variantId"`
+	Name       string  `json:"name"`
+	SKU        string  `json:"sku"`
+	Color      string  `json:"color"`
+	Storage    string  `json:"storage"`
+	Price      float64 `json:"price"`
+	Quantity   int     `json:"quantity"`
+	TotalPrice float64 `json:"totalPrice"`
 }
 
 // UpdateOrderStatusRequest DTO for updating order status
@@ -62,4 +62,3 @@ type OrdersListResponse struct {
 	Total      int64            `json:"total"`
 	TotalPages int              `json:"totalPages"`
 }
-
